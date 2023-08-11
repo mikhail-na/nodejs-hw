@@ -1,7 +1,7 @@
 const joi = require("joi");
 
 const addSchema = joi.object({
-   name: joi.string().required().messages({
+  name: joi.string().required().messages({
     "any.required": `Missing required name field`,
   }),
 
@@ -12,6 +12,7 @@ const addSchema = joi.object({
   phone: joi.string().required().messages({
     "any.required": `Missing required phone field`,
   }),
+  favorite: joi.boolean(),
 });
 
 const addUpdSchema = joi.object({
@@ -20,8 +21,15 @@ const addUpdSchema = joi.object({
   phone: joi.string(),
 });
 
+const updFavoriteSchema = joi.object({
+  favorite: joi.boolean().required().messages({
+    "any.required": `Missing required favorite field`,
+  }),
+});
+
 
 module.exports = {
   addSchema,
   addUpdSchema,
+  updFavoriteSchema,
 };
