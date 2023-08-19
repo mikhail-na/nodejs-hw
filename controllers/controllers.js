@@ -1,10 +1,10 @@
 const ContactModel = require("../models/contactDB");
 const { HttpError } = require("../helpers");
 
-
 const getAllContacts = async (req, res, next) => {
   try {
-    const result = await ContactModel.find();
+    const { _id: owner } = req.user;
+    const result = await ContactModel.find({ owner }).populate("owner", "name email");
     res.json(result);
   } catch (err) {
     next(err);
@@ -25,10 +25,12 @@ const getById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-    try {
-        const body = req.body;
-
-        const result = await ContactModel.create(body);
+  try {
+      
+    const { _id: owner } = req.user;
+      const body = req.body;
+      
+        const result = await ContactModel.create({...body, owner});
         res.status(201).json(result);
     } catch (err) {
         next(err);
@@ -57,7 +59,7 @@ const updFavorite = async (req, res, next) => {
     const result = await ContactModel.findByIdAndUpdate(id, body, {new:true});
 
     if (!result) {
-      throw HttpError(400, "missing favorite field");
+      throw HttpError(400, "Missing favorite field");
     }
     res.json(result);
   } catch (err) {
