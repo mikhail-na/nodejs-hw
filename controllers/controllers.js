@@ -17,7 +17,7 @@ const getById = async (req, res, next) => {
     const { _id: owner } = req.user;
     const { id } = req.params;
 
-    const result = await ContactModel.findById({ _id: id, owner });
+    const result = await ContactModel.findOne({ _id: id, owner });
     if (!result) {
       throw HttpError(404, "Not found");
     }
@@ -47,7 +47,7 @@ const updContactById = async (req, res, next) => {
     const body = req.body;
     const { id } = req.params;
       
-    const result = await ContactModel.findByIdAndUpdate({ _id: id, owner }, body, { new: true });
+    const result = await ContactModel.findOneAndUpdate({ _id: id, owner }, body, { new: true });
 
     if (!result) {
       throw HttpError(404, "Not Found");
@@ -65,7 +65,7 @@ const updFavorite = async (req, res, next) => {
     const body = req.body;
      
 
-    const result = await ContactModel.findByIdAndUpdate({ _id: id, owner }, body, { new: true });
+    const result = await ContactModel.findOneAndUpdate({ _id: id, owner }, body, { new: true });
 
     if (!result) {
       throw HttpError(400, "Missing favorite field");
@@ -81,7 +81,7 @@ const deleteContactById = async (req, res, next) => {
     const { _id: owner } = req.user;
     const { id } = req.params;
 
-    const result = await ContactModel.findByIdAndDelete({ _id: id, owner });
+    const result = await ContactModel.findOneAndRemove({ _id: id, owner });
     if (!result) {
       throw HttpError(404, "Not Found");
     }
