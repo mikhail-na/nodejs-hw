@@ -3,9 +3,8 @@ const router = express.Router();
 
 const ctrl = require('../../controllers/controllers');
 
-
 const schemas = require("../../schemas/validateSchemas");
-const {validateFunc, handleBodyChange, isValidIdFunc, authenticate} = require("../../middlewares");
+const { validateFunc, handleBodyChange, isValidIdFunc, authenticate } = require("../../middlewares");
 
 router.get('/', authenticate, ctrl.getAllContacts);
 
@@ -18,7 +17,6 @@ router.put("/:id", authenticate, isValidIdFunc, handleBodyChange, validateFunc(s
 router.patch("/:id/favorite", authenticate, isValidIdFunc, validateFunc(schemas.updFavoriteSchema), ctrl.updFavorite);
 
 router.delete('/:id', authenticate, isValidIdFunc, ctrl.deleteContactById);
-
 
 
 module.exports = router;
