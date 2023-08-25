@@ -2,9 +2,17 @@ const User = require("../models/authUser");
 const { HttpError } = require("../helpers");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+
+const Jimp = require("jimp");
 
 const BCRYPT_SALT = 10;
 const { SECRET_KEY = "g676g78g8gG8g8gY8" } = process.env;
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+
 
 const register = async (req, res, next) => {
   try {
@@ -14,15 +22,18 @@ const register = async (req, res, next) => {
       throw HttpError(409, "Email is already registered");
     }
 
+    const avatarURL = gravatar.url(email);
+
     const salt = await bcrypt.genSalt(BCRYPT_SALT);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL });
 
     res.status(201).json({
       user: {
         email: newUser.email,
         subscription: newUser.subscription,
+        avatarURL
       },
     });
   } catch (err) {
@@ -82,9 +93,37 @@ const logout = async (req, res, next) => {
   res.status(204);
 };
 
+
+const updAvatar = async (req, res, next) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  const uniqueName = `${_id}_${originalname}`
+
+  try {
+
+    const resultJimp = await Jimp.read(tempUpload);
+    await resultJimp.resize(250, 250).writeAsync(tempUpload);
+
+
+    const resultUpload = path.join(avatarsDir, uniqueName);
+    await fs.rename(tempUpload, resultUpload);
+
+    const avatarURL = path.join("public", "avatars", uniqueName);
+    await User.findByIdAndUpdate(_id, { avatarURL })
+
+    res.json({
+      avatarURL
+    })
+  } catch (err) {
+    await fs.unlink(tempUpload);
+    next(err);
+  }
+}
+
 module.exports = {
   register,
   login,
   getCurrent,
   logout,
+  updAvatar,
 };
