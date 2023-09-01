@@ -28,12 +28,20 @@ const userSchema = new Schema(
     },
     token: {
       type: String,
-      default:"",
+      default: "",
     },
     avatarURL: {
       type: String,
       required: true,
-    }
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verification token is required"],
+    },
   },
   {
     versionKey: false,

@@ -20,21 +20,18 @@ const authenticate = async (req, res, next) => {
   try {
     const { id } = jwt.verify(token, SECRET_KEY);
     const user = await User.findById(id);
-    if (!user) {
-      // 2d var ==> if (!user || !user.token || user.token!==token)
+    
+    if (!user || !user.token || user.token !== token) {
       next(HttpError(401));
     }
     req.user = user;
     next();
-  } catch (err) {
-    if (err instanceof jwt.TokenExpiredError) {
-      next(HttpError(401, "Token expired")) ;
-    }
-    if (err instanceof jwt.JsonWebTokenError) {
-      next(HttpError(401, "Token is not valid"));
-    }
+
+  } catch {
+    next(HttpError(401));
+
   
   }
-}
+};
 
 module.exports = authenticate;
